@@ -10,6 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:id="@+id/constraint_layout"
         android:layout_gravity="center"
         android:background="@color/colorAccent"
         android:orientation="vertical"

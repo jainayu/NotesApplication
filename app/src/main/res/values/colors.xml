@@ -4,4 +4,12 @@
     <color name="colorRed">#EF3F3E</color>
     <color name="colorPrimaryDark">#1A237E</color>
     <color name="colorAccent">#FFCB08</color>
+
+    <color name="colorNotesLightPink">#FF7EB9</color>
+    <color name="colorNotesDarkPink">#F83784</color>
+    <color name="colorNotesCyan">#7AFCFF</color>
+    <color name="colorNotesCrimsonRed">#DC143C</color>
+    <color name="colorNotesYellow">#FFCB08</color>
+    <color name="trans">#00FFFFFF</color>
+
 </resources>

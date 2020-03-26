@@ -1,6 +1,7 @@
 package com.example.notes.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.notes.R;
 import com.example.notes.model.Note;
@@ -39,9 +41,12 @@ public class NotesAdapter extends ArrayAdapter<Note> {
 
         TextView textViewTitle = view.findViewById(R.id.tile);
         TextView textViewDesc = view.findViewById(R.id.description);
+        ConstraintLayout constraintLayout = view.findViewById(R.id.constraint_layout);
 
+        constraintLayout.setBackgroundColor(Color.parseColor(note.getColorCode()));
         textViewTitle.setText(note.getTitle());
         textViewDesc.setText(note.getDesc());
+
 
 
         return view;

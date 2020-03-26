@@ -4,9 +4,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,12 @@ import com.example.notes.model.Note;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.notes.ui.AddNotesActivity.CRIMSON_RED;
+import static com.example.notes.ui.AddNotesActivity.CYAN;
+import static com.example.notes.ui.AddNotesActivity.DARK_PINK;
+import static com.example.notes.ui.AddNotesActivity.LIGHT_PINK;
+import static com.example.notes.ui.AddNotesActivity.YELLOW;
+
 public class NotesActivity extends AppCompatActivity {
     List<Note> noteList;
     SQLiteDatabase mDatabase;
@@ -31,6 +39,7 @@ public class NotesActivity extends AppCompatActivity {
     NotesAdapter adapter;
     TextView inst;
     ImageView addNotes;
+    String color;
     Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +77,8 @@ public class NotesActivity extends AppCompatActivity {
                         cursorNotes.getInt(0),
                         cursorNotes.getString(1),
                         cursorNotes.getString(2),
-                        cursorNotes.getString(3)
+                        cursorNotes.getString(3),
+                        cursorNotes.getString(4)
                 ));
             } while (cursorNotes.moveToNext());
         }
@@ -84,7 +94,7 @@ public class NotesActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 LayoutInflater inflater = LayoutInflater.from(view.getContext());
-                View updateView = inflater.inflate(R.layout.layout_update_notes, null);
+                final View updateView = inflater.inflate(R.layout.layout_update_notes, null);
                 builder.setView(updateView);
 
                 final EditText updateEditTextTitle = updateView.findViewById(R.id.update_notes_title);
@@ -92,8 +102,51 @@ public class NotesActivity extends AppCompatActivity {
                 final ImageView save = updateView.findViewById(R.id.save);
                 final ImageView delete = updateView.findViewById(R.id.delete);
 
+                final ImageView colorCyan = updateView.findViewById(R.id.update_color_cyan);
+                final ImageView colorLightPink = updateView.findViewById(R.id.update_color_light_pink);
+                final ImageView colorDarkPink = updateView.findViewById(R.id.update_color_dark_pink);
+                final ImageView colorRed = updateView.findViewById(R.id.update_color_crimson_red);
+                final ImageView colorYellow = updateView.findViewById(R.id.update_color_yellow);
+
                 updateEditTextTitle.setText(noteList.get(position).getTitle());
                 updateEditTextDesc.setText(noteList.get(position).getDesc());
+                color = noteList.get(position).getColorCode();
+                switch (color){
+                    case CRIMSON_RED:
+                        colorRed.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        break;
+                    case  AddNotesActivity.CYAN:
+                        colorCyan.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        break;
+                    case  YELLOW:
+                        colorYellow.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        break;
+                    case DARK_PINK:
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        break;
+                    case LIGHT_PINK:
+                        colorLightPink.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        break;
+                }
+
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialogInterface) {
+                        String title = updateEditTextTitle.getText().toString().trim();
+                        String desc = updateEditTextDesc.getText().toString().trim();
+
+                        String sql = "UPDATE notes\n" +
+                                "SET title=?,\n" +
+                                "description=?,\n" +
+                                "timestamp= CURRENT_TIMESTAMP\n," +
+                                "color=?" +
+                                "WHERE id=?;\n";
+
+                        mDatabase.execSQL(sql,new String[]{title, desc, color, String.valueOf(noteList.get(position).getId())});
+                        Toast.makeText(updateView.getContext(), "Notes Updated",Toast.LENGTH_LONG).show();
+                        reloadEmployeesFromDatabase();
+                    }
+                });
 
                 final AlertDialog dialog = builder.create();
                 dialog.show();
@@ -107,10 +160,11 @@ public class NotesActivity extends AppCompatActivity {
                         String sql = "UPDATE notes\n" +
                                 "SET title=?,\n" +
                                 "description=?,\n" +
-                                "timestamp= CURRENT_TIMESTAMP\n" +
+                                "timestamp= CURRENT_TIMESTAMP\n," +
+                                "color=?" +
                                 "WHERE id=?;\n";
 
-                        mDatabase.execSQL(sql,new String[]{title, desc,String.valueOf(noteList.get(position).getId())});
+                        mDatabase.execSQL(sql,new String[]{title, desc, color,String.valueOf(noteList.get(position).getId())});
                         Toast.makeText(view.getContext(), "Notes Updated",Toast.LENGTH_LONG).show();
                         reloadEmployeesFromDatabase();
                         dialog.dismiss();
@@ -127,6 +181,67 @@ public class NotesActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+
+
+                colorCyan.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        color = CYAN;
+                        colorCyan.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        colorRed.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorLightPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorYellow.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                    }
+                });
+
+                colorLightPink.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        color = LIGHT_PINK;
+                        colorCyan.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorRed.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorLightPink.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        colorYellow.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                    }
+                });
+                colorDarkPink.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        color = DARK_PINK;
+                        colorCyan.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorRed.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        colorLightPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorYellow.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                    }
+                });
+                colorRed.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        color = CRIMSON_RED;
+                        colorCyan.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorRed.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorLightPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorYellow.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                    }
+                });
+                colorYellow.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view) {
+                        color = YELLOW;
+                        colorCyan.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorRed.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorDarkPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorLightPink.setBackgroundColor(Color.parseColor("#00FFFFFF"));
+                        colorYellow.setBackgroundColor(Color.parseColor("#D3D3D3"));
+                    }
+                });
+
+
+
             }
         });
     }
@@ -144,7 +259,8 @@ public class NotesActivity extends AppCompatActivity {
                         cursorNotes.getInt(0),
                         cursorNotes.getString(1),
                         cursorNotes.getString(2),
-                        cursorNotes.getString(3)
+                        cursorNotes.getString(3),
+                        cursorNotes.getString(4)
                 ));
             } while (cursorNotes.moveToNext());
         }
@@ -160,7 +276,8 @@ public class NotesActivity extends AppCompatActivity {
                         "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                         "    title VARCHAR(200),\n" +
                         "    description VARCHAR(200),\n" +
-                        "    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" +
+                        "    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n" +
+                        "    color VARCHAR(7)" +
                         ");"
         );
     }
