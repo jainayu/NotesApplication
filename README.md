@@ -1,5 +1,5 @@
 # NotesApplication
-This is a very simple and basic application to take and ave your personal notes.
+This is a very simple and basic application to take and save your personal notes.
 This application do not require internet and work on the local memory. So don't worry about privacy breach.
 
 ### You can download the application through this link:
